@@ -42,6 +42,36 @@ def refusal_template() -> str:
     return "This question is not covered in the available policy documents\n(policy_hr_leave.txt, policy_it_acceptable_use.txt, policy_finance_reimbursement.txt).\nPlease contact [relevant team] for guidance."
 
 def main():
+    parser = argparse.ArgumentParser(description="UC-X Policy QA Agent")
+    parser.add_argument("--output", help="Path to write QA results to")
+    parser.add_argument("--batch", action="store_true", help="Run the 7 required test questions")
+    args = parser.parse_args()
+
+    test_questions = [
+        "Can I carry forward unused annual leave?",
+        "Can I install Slack on my work laptop?",
+        "What is the home office equipment allowance?",
+        "Can I use my personal phone for work files from home?",
+        "What is the company view on flexible working culture?",
+        "Can I claim DA and meal receipts on the same day?",
+        "Who approves leave without pay?"
+    ]
+
+    if args.batch:
+        output_lines = []
+        for q in test_questions:
+            ans = answer_question(q)
+            output_lines.append(f"Q: {q}\nA: {ans}\n" + "-"*40)
+        
+        final_output = "\n".join(output_lines)
+        if args.output:
+            with open(args.output, 'w', encoding='utf-8') as f:
+                f.write(final_output)
+            print(f"Success! Batch results written to {args.output}")
+        else:
+            print(final_output)
+        return
+
     print("Ask My Documents - Type your question (or 'exit' to quit):")
     while True:
         try:
